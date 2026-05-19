@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "terminal-buddy"
+version = "0.1.0"
+description = "AI-powered terminal assistant using local Ollama models"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+keywords = ["terminal", "cli", "ai", "assistant", "ollama", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Shells",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "requests>=2.28.0",
+    "rich>=13.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/xiaofeihu/terminal-buddy"
+Repository = "https://github.com/xiaofeihu/terminal-buddy"
+Issues = "https://github.com/xiaofeihu/terminal-buddy/issues"
+
+[project.scripts]
+terminal-buddy = "terminal_buddy.cli:main"
+hey = "terminal_buddy.cli:hey_main"
+yolo = "terminal_buddy.cli:yolo_main"
+buddy-diagnose = "terminal_buddy.cli:diagnose_main"
+
+[tool.setuptools.packages.find]
+include = ["terminal_buddy*"]
+
+[tool.setuptools.package-data]
+terminal_buddy = ["../shell/*.zsh"]
