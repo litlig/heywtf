@@ -95,6 +95,9 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+# Terminal Buddy local config (contains API keys) — config.example.json stays tracked
+config.json
+
 # Environments
 .env
 .venv
@@ -129,3 +132,6 @@ dmypy.json
 *.swo
 *~
 .DS_Store
+
+# claude
+.claude

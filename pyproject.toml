@@ -3,13 +3,13 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "terminal-buddy"
+name = "heywtf"
 version = "0.1.0"
-description = "AI-powered terminal assistant using local Ollama models"
+description = "AI-powered terminal assistant with multiple backends: Ollama, OpenAI, Gemini, ChatGPT web, and web relay"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
-keywords = ["terminal", "cli", "ai", "assistant", "ollama", "llm"]
+keywords = ["terminal", "cli", "ai", "assistant", "ollama", "chatgpt", "llm"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -30,19 +30,18 @@ dependencies = [
     "rich>=13.0.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/xiaofeihu/terminal-buddy"
-Repository = "https://github.com/xiaofeihu/terminal-buddy"
-Issues = "https://github.com/xiaofeihu/terminal-buddy/issues"
+[project.optional-dependencies]
+chatgpt-web = ["playwright>=1.40.0"]
+openai = ["openai>=1.0.0"]
+gemini = ["google-generativeai>=0.5.0"]
 
 [project.scripts]
-terminal-buddy = "terminal_buddy.cli:main"
-hey = "terminal_buddy.cli:hey_main"
-yolo = "terminal_buddy.cli:yolo_main"
-buddy-diagnose = "terminal_buddy.cli:diagnose_main"
+heywtf = "source.cli:main"
+hey = "source.cli:hey_main"
+buddy-diagnose = "source.cli:buddy_diagnose_main"
 
 [tool.setuptools.packages.find]
-include = ["terminal_buddy*"]
+include = ["source*"]
 
 [tool.setuptools.package-data]
-terminal_buddy = ["../shell/*.zsh"]
+source = ["../shell/*.zsh"]

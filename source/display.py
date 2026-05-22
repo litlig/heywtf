@@ -1,4 +1,4 @@
-"""Rich terminal display utilities for Terminal Buddy."""
+"""Rich terminal display utilities for heywtf."""
 
 import sys
 from rich.console import Console
@@ -65,6 +65,8 @@ def print_separator():
     console.print(f"  [{DIM}]{'─' * 50}[/]")
 
 
-def print_banner():
-    """Print a small banner/branding."""
-    console.print(f"  [{DIM}]terminal-buddy • powered by ollama[/]")
+def print_banner(backend: str, model: str | None = None):
+    powered_by = f"powered by {backend}"
+    if model:
+        powered_by += f" ({model})"
+    console.print(f"  [{DIM}]heywtf • {powered_by}[/]")

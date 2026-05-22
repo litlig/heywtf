@@ -1,12 +1,13 @@
-# Terminal Buddy — zsh auto-error detection
+# heywtf — zsh error capture
 # Add this to your ~/.zshrc:
-#   source /path/to/terminal-buddy/shell/buddy.zsh
+#   source /path/to/heywtf/shell/buddy.zsh
 #
 # How it works:
 #   - preexec: saves the command string, redirects stderr through tee to capture it
-#   - precmd: checks exit code, if non-zero, calls buddy-diagnose with the error
+#   - precmd: checks exit code, if non-zero, saves the command + error so you can
+#     diagnose it later by running: hey wtf
 #
-# Set BUDDY_DISABLED=1 to temporarily disable auto-detection.
+# Set BUDDY_DISABLED=1 to temporarily disable error capture.
 # Set BUDDY_VERBOSE=1 to see debug info.
 
 # --- Configuration ---
@@ -51,6 +52,7 @@ __buddy_preexec() {
 
   __buddy_cmd="$1"
   __buddy_capturing=0
+  __buddy_stderr_file=""  # clear so precmd can't read a prior command's stderr
 
   # Skip stderr capture for blacklisted (interactive) commands
   if __buddy_is_blacklisted "$1"; then
@@ -78,15 +80,15 @@ __buddy_precmd() {
     sleep 0.05
   fi
 
-  # If the command failed and we have a command recorded, diagnose it
+  # If the command failed, save it + its error so `hey wtf` can diagnose later
   if [[ $rc -ne 0 && -n "$__buddy_cmd" && "$__buddy_cmd" != buddy-diagnose* ]]; then
     local stderr_content=""
     if [[ -f "$__buddy_stderr_file" ]]; then
       stderr_content=$(cat "$__buddy_stderr_file" 2>/dev/null)
     fi
 
-    # Call buddy-diagnose (the Python CLI entry point)
-    buddy-diagnose "$__buddy_cmd" "$rc" "$stderr_content" 2>&1
+    # Persist the failed command + error (the Python CLI entry point)
+    buddy-diagnose "$__buddy_cmd" "$rc" "$stderr_content"
   fi
 
   # Cleanup
@@ -104,30 +106,16 @@ add-zsh-hook precmd __buddy_precmd
 
 # --- Manual commands ---
 
-# `wtf` — re-diagnose the last failed command from history
-wtf() {
-  local last_cmd
-  last_cmd=$(fc -ln -1 | sed 's/^ *//')
-
-  if [[ -z "$last_cmd" ]]; then
-    echo "No previous command found."
-    return 1
-  fi
-
-  echo "Re-running: $last_cmd"
-  yolo eval "$last_cmd"
-}
-
-# `buddy-off` / `buddy-on` — toggle auto-detection
+# `buddy-off` / `buddy-on` — toggle error capture
 buddy-off() {
   export BUDDY_DISABLED=1
-  echo "🔇 Terminal Buddy auto-detection disabled."
+  echo "🔇 heywtf error capture disabled."
 }
 
 buddy-on() {
   unset BUDDY_DISABLED
-  echo "🔊 Terminal Buddy auto-detection enabled."
+  echo "🔊 heywtf error capture enabled."
 }
 
-echo "🤖 Terminal Buddy loaded. Auto-error detection active."
+echo "🤖 heywtf loaded. When a command fails, run 'hey wtf' to diagnose it."
 echo "   Use 'buddy-off' to disable, 'buddy-on' to re-enable."

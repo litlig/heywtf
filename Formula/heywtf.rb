@@ -1,16 +1,16 @@
-# Homebrew Formula for Terminal Buddy
+# Homebrew Formula for heywtf
 # This file goes in your homebrew-tap repo:
-#   github.com/xiaofeihu/homebrew-tap/Formula/terminal-buddy.rb
+#   github.com/litlig/homebrew-tap/Formula/heywtf.rb
 #
 # Users install with:
-#   brew install xiaofeihu/tap/terminal-buddy
+#   brew install litlig/tap/heywtf
 
-class TerminalBuddy < Formula
+class Heywtf < Formula
   include Language::Python::Virtualenv
 
-  desc "AI-powered terminal assistant using local Ollama models"
-  homepage "https://github.com/xiaofeihu/terminal-buddy"
-  url "https://files.pythonhosted.org/packages/source/t/terminal-buddy/terminal_buddy-0.1.0.tar.gz"
+  desc "AI-powered terminal assistant — ask anything or diagnose failures with 'hey wtf'"
+  homepage "https://github.com/litlig/heywtf"
+  url "https://files.pythonhosted.org/packages/source/h/heywtf/heywtf-0.1.0.tar.gz"
   sha256 "REPLACE_WITH_ACTUAL_SHA256_AFTER_PYPI_PUBLISH"
   license "MIT"
 
@@ -18,7 +18,7 @@ class TerminalBuddy < Formula
   depends_on "ollama" => :recommended
 
   # Add resource blocks for each dependency.
-  # Generate these with: `poet terminal-buddy`  (brew install poet first)
+  # Generate these with: `poet heywtf`  (brew install poet first)
   #
   # resource "requests" do
   #   url "https://files.pythonhosted.org/packages/..."
@@ -34,23 +34,23 @@ class TerminalBuddy < Formula
     virtualenv_install_with_resources
 
     # Install the shell integration script
-    (share / "terminal-buddy").install "shell/buddy.zsh"
+    (share / "heywtf").install "shell/buddy.zsh"
   end
 
   def caveats
     <<~EOS
       To enable auto-error detection, add to your ~/.zshrc:
 
-        eval "$(terminal-buddy --init-shell)"
+        eval "$(heywtf --init-shell)"
 
       Make sure Ollama is running:
 
         brew services start ollama
-        ollama pull qwen3-coder:1.5b
+        ollama pull qwen2.5-coder:0.5b
     EOS
   end
 
   test do
-    assert_match "terminal-buddy", shell_output("#{bin}/terminal-buddy 2>&1", 0)
+    assert_match "heywtf", shell_output("#{bin}/heywtf 2>&1", 0)
   end
 end

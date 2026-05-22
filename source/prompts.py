@@ -1,4 +1,4 @@
-"""System prompts for Terminal Buddy."""
+"""System prompts for heywtf."""
 
 ASK_SYSTEM_PROMPT = """\
 You are a concise terminal/shell expert assistant. The user will ask how to do \
@@ -48,7 +48,7 @@ def build_ask_messages(question: str) -> list[dict]:
 
 
 def build_fix_messages(command: str, exit_code: int, stderr: str, stdout: str) -> list[dict]:
-    """Build message list for the fix (yolo) mode."""
+    """Build message list for the fix (wtf) mode."""
     # Combine relevant output, prioritizing stderr
     output_parts = []
     if stderr.strip():
