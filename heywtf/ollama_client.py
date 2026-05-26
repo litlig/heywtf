@@ -3,47 +3,19 @@
 import requests
 import json
 from typing import Generator
-from source.providers import Provider, ProviderError
+from heywtf.providers import Provider, ProviderError
 
-
-# Keep backward-compatible exceptions
 OllamaError = ProviderError
 
 
 class OllamaProvider(Provider):
-    """Ollama API provider for local model inference."""
-
     def __init__(self, model: str, ollama_url: str = "http://localhost:11434"):
-        """Initialize Ollama provider.
-
-        Args:
-            model: Ollama model name (e.g., 'qwen2.5-coder:0.5b').
-            ollama_url: Base URL for Ollama.
-        """
         self.model = model
         self.ollama_url = ollama_url
 
-    def chat_stream(
-        self,
-        messages: list[dict],
-    ) -> Generator[str, None, None]:
-        """Stream chat response from Ollama, yielding content chunks.
-
-        Args:
-            messages: List of message dicts with 'role' and 'content'.
-
-        Yields:
-            Content string chunks as they arrive.
-
-        Raises:
-            ProviderError: If the request fails or Ollama is unreachable.
-        """
+    def chat_stream(self, messages: list[dict]) -> Generator[str, None, None]:
         url = f"{self.ollama_url.rstrip('/')}/api/chat"
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "stream": True,
-        }
+        payload = {"model": self.model, "messages": messages, "stream": True}
 
         try:
             response = requests.post(url, json=payload, stream=True, timeout=30)
@@ -71,11 +43,9 @@ class OllamaProvider(Provider):
             except json.JSONDecodeError:
                 continue
 
-            # Yield the content if present
             content = chunk.get("message", {}).get("content", "")
             if content:
                 yield content
 
-            # Stop if done
             if chunk.get("done", False):
                 return

@@ -40,7 +40,6 @@ sudo chmod 777 /etc/hosts\
 
 
 def build_ask_messages(question: str) -> list[dict]:
-    """Build message list for the ask (hey) mode."""
     return [
         {"role": "system", "content": ASK_SYSTEM_PROMPT},
         {"role": "user", "content": question},
@@ -48,8 +47,6 @@ def build_ask_messages(question: str) -> list[dict]:
 
 
 def build_fix_messages(command: str, exit_code: int, stderr: str, stdout: str) -> list[dict]:
-    """Build message list for the fix (wtf) mode."""
-    # Combine relevant output, prioritizing stderr
     output_parts = []
     if stderr.strip():
         output_parts.append(f"Stderr:\n{stderr.strip()}")
@@ -57,7 +54,6 @@ def build_fix_messages(command: str, exit_code: int, stderr: str, stdout: str) -
         output_parts.append(f"Stdout:\n{stdout.strip()}")
 
     output = "\n".join(output_parts) if output_parts else "(no output)"
-
     user_msg = f"Command: {command}\nExit code: {exit_code}\n{output}"
 
     return [

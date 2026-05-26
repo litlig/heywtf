@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "heywtf"
 version = "0.1.0"
-description = "AI-powered terminal assistant with multiple backends: Ollama, OpenAI, Gemini, ChatGPT web, and web relay"
+description = "AI-powered terminal assistant — ask anything or diagnose failures with 'hey wtf'"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
-keywords = ["terminal", "cli", "ai", "assistant", "ollama", "chatgpt", "llm"]
+keywords = ["terminal", "cli", "ai", "assistant", "ollama", "llm", "shell"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Operating System :: MacOS",
@@ -28,20 +28,17 @@ classifiers = [
 dependencies = [
     "requests>=2.28.0",
     "rich>=13.0.0",
+    "openai>=1.0.0",
+    "google-generativeai>=0.5.0",
 ]
 
-[project.optional-dependencies]
-chatgpt-web = ["playwright>=1.40.0"]
-openai = ["openai>=1.0.0"]
-gemini = ["google-generativeai>=0.5.0"]
-
 [project.scripts]
-heywtf = "source.cli:main"
-hey = "source.cli:hey_main"
-buddy-diagnose = "source.cli:buddy_diagnose_main"
+heywtf = "heywtf.cli:main"
+hey = "heywtf.cli:hey_main"
+buddy-diagnose = "heywtf.cli:buddy_diagnose_main"
 
 [tool.setuptools.packages.find]
-include = ["source*"]
+include = ["heywtf*"]
 
 [tool.setuptools.package-data]
-source = ["../shell/*.zsh"]
+heywtf = ["shell/*.zsh"]

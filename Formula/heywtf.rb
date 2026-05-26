@@ -39,11 +39,11 @@ class Heywtf < Formula
 
   def caveats
     <<~EOS
-      To enable auto-error detection, add to your ~/.zshrc:
+      Run the setup wizard to choose a backend and configure shell integration:
 
-        eval "$(heywtf --init-shell)"
+        hey config
 
-      Make sure Ollama is running:
+      To use Ollama (default, local, no API key):
 
         brew services start ollama
         ollama pull qwen2.5-coder:0.5b

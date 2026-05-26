@@ -1,129 +1,61 @@
-# heywtf 🤖
+# heywtf
 
-AI-powered terminal assistant with **multiple AI backends** and flexible usage modes:
+AI-powered terminal assistant for macOS. Ask how to do things in the terminal, or diagnose the last failed command.
+
+> **Platform:** macOS with zsh. Linux works for `hey` queries but `hey wtf` shell integration is zsh-only.
 
 **Backends:**
-- 🔒 **Ollama** — Local, private, 100% offline (default)
-- 🚀 **ChatGPT Web** — Powerful AI without API keys (browser automation)
-- 🔓 **OpenAI** — GPT-4o, GPT-4o-mini, etc. (bring your API key)
-- 🔓 **Gemini** — Google's models (bring your API key)
-
-Choose what works best for you — switch anytime!
-
-## Features
-
-- **`hey`** — Ask how to do something (uses default model)
-- **`hey o <query>`** — Use OpenAI (requires API key)
-- **`hey g <query>`** — Use Gemini (requires API key)
-- **`hey web <query>`** — Use ChatGPT Web (browser automation, no API key)
-- **`hey wtf`** — Diagnose the last failed command
-- **Error capture** — Automatically remembers failed commands so `hey wtf` can diagnose them (via zsh hook)
-- **`buddy-off` / `buddy-on`** — Toggle error capture
+- **Ollama** — local, private, no API key (default)
+- **OpenAI** — GPT-4o, GPT-4o-mini (API key required)
+- **Gemini** — Google Gemini (API key required)
 
 ## Install
 
-### Homebrew (recommended)
+### macOS
 
 ```bash
 brew install litlig/tap/heywtf
 ```
 
-### pipx
+### Linux / manual
 
 ```bash
-pipx install heywtf
+git clone https://github.com/litlig/heywtf.git
+cd heywtf
+pip install -e .
 ```
 
-### pip
+## First-time setup
+
+Run the interactive setup wizard:
 
 ```bash
-pip install heywtf
+hey config
 ```
 
-### Shell Setup
-
-After installing, add this to your `~/.zshrc` to enable auto-error detection:
-
-```bash
-eval "$(heywtf --init-shell)"
-```
-
-Then reload your shell:
-
-```bash
-source ~/.zshrc
-```
-
-## Prerequisites
-
-**Choose at least one backend:**
-
-### Option 1: Ollama (Default - Recommended)
-- [Ollama](https://ollama.com) running locally
-- A model pulled (default: `qwen2.5-coder:0.5b`)
-
-```bash
-ollama serve     # in one terminal
-ollama pull qwen2.5-coder:0.5b
-```
-
-### Option 2: ChatGPT Web
-- Logged into [ChatGPT](https://chat.openai.com)
-- No API key needed, uses browser automation
-- Install the browser dependency:
-
-```bash
-pip install 'heywtf[chatgpt-web]'
-playwright install chromium
-```
-
-### Option 3: OpenAI (with `hey o`)
-- [OpenAI API key](https://platform.openai.com/api-keys)
-- Add `"openai_api_key": "sk-..."` to `~/.config/heywtf/config.json`
-
-### Option 4: Gemini (with `hey g`)
-- [Google API key](https://aistudio.google.com/apikey)
-- Add `"gemini_api_key": "AIza..."` to `~/.config/heywtf/config.json`
-
-See [BACKENDS.md](BACKENDS.md) for detailed setup instructions and comparison.
+It will ask you to choose a backend, set an API key if needed, and optionally add shell integration to your `~/.zshrc` so `hey wtf` works.
 
 ## Usage
 
-### Ask a question with default model
+### Ask a question
 
 ```bash
 hey how to count words in a file
-hey "find all python files modified in the last 24 hours"
-hey "compress a directory with tar"
+hey find all python files modified in the last 24 hours
+hey compress a directory with tar
 ```
 
-### Use OpenAI (requires API key)
+### Diagnose a failed command
+
+After any failed command, run:
 
 ```bash
-hey o "explain async/await in Python"
-hey o "write a dockerfile for a node app"
+hey wtf
 ```
 
-### Use Gemini (requires API key)
+Example:
 
-```bash
-hey g "what's the best way to structure a REST API?"
-hey g "debug this regex: ^\\d{3}-\\d{3}-\\d{4}$"
 ```
-
-### Use ChatGPT Web (no API key needed)
-
-```bash
-hey web "search for best practices on docker networking"
-```
-
-> **Note:** Requires being logged into ChatGPT and the `heywtf[chatgpt-web]` extra installed.
-
-### Re-diagnose previous error
-
-After any command fails:
-
-```bash
 $ chmod 777 /etc/hosts
 chmod: changing permissions of '/etc/hosts': Operation not permitted
 
@@ -137,81 +69,65 @@ $ hey wtf
   sudo chmod 777 /etc/hosts
 ```
 
-### Error capture
+Requires shell integration (set up via `hey config`).
 
-When a command fails, heywtf silently remembers it. Run `hey wtf` whenever you
-want the diagnosis:
+### One-off backend override
 
 ```bash
-$ chmod 777 /etc/hosts
-chmod: changing permissions of '/etc/hosts': Operation not permitted
-
-$ hey wtf
-
-  heywtf • powered by ollama (qwen2.5-coder:0.5b)
-  ❌ Command failed: chmod 777 /etc/hosts
-  ──────────────────────────────────────────────────
-
-  Permission denied — you need elevated privileges:
-  sudo chmod 777 /etc/hosts
+hey o explain async/await in Python    # use OpenAI for this query
+hey g what is the difference between TCP and UDP  # use Gemini for this query
 ```
+
+### Configure
+
+```bash
+hey config           # interactive setup wizard
+hey config show      # view current config
+hey config set backend openai          # set default backend
+hey config set openai_api_key sk-...   # set API key
+hey config set ollama_model qwen3-coder:3b
+```
+
+API keys can also be set via environment variables: `OPENAI_API_KEY`, `GOOGLE_API_KEY`.
 
 ### Toggle error capture
 
 ```bash
-buddy-off   # disable error capture (e.g. before running vim)
-buddy-on    # re-enable
+buddy-off   # pause capture (e.g. before an interactive session)
+buddy-on    # resume
 ```
 
-## How Error Capture Works
+## Ollama setup
 
-1. **`preexec` hook** — Before each command, captures the command string and tees its stderr
-2. **`precmd` hook** — After each command, checks the exit code. If non-zero, saves the command + stderr so `hey wtf` can diagnose it later
-3. **Blacklist** — Interactive programs (vim, ssh, less, top, etc.) skip capture to avoid breaking them
+Ollama is the default backend — local, private, no API key needed.
 
-## Configuration
-
-### Models
-
-Each backend has its own model. Set per-backend models in `~/.config/heywtf/config.json`:
-
-```json
-{
-  "ollama_model": "qwen3-coder:3b",
-  "openai_model": "gpt-4o",
-  "gemini_model": "gemini-1.5-pro"
-}
+```bash
+brew install ollama
+ollama serve
+ollama pull qwen2.5-coder:0.5b
 ```
 
-Each backend uses its own model — settings never leak across backends. If unset, each falls back to a sensible built-in default (Ollama → `qwen2.5-coder:0.5b`, OpenAI → `gpt-4o-mini`, Gemini → `gemini-2.0-flash`).
+## How `hey wtf` works
 
-### API Keys
+1. A `preexec` zsh hook captures each command and its stderr
+2. A `precmd` hook checks the exit code — if non-zero, saves the command + error
+3. `hey wtf` reads that saved context and asks the AI to diagnose it
+4. Interactive commands (vim, ssh, top, etc.) are skipped to avoid breaking them
 
-Save API keys in `~/.config/heywtf/config.json`:
+## Architecture
 
-```json
-{
-  "openai_api_key": "sk-...",
-  "gemini_api_key": "..."
-}
-```
+- **`heywtf/providers.py`** — abstract `Provider` base class + `Backend` enum
+- **`heywtf/provider_factory.py`** — instantiates providers by backend
+- **`heywtf/ollama_client.py`** — Ollama (local inference)
+- **`heywtf/openai_provider.py`** — OpenAI API
+- **`heywtf/gemini_provider.py`** — Google Gemini API
+- **`heywtf/config.py`** — config read/write (`~/.config/heywtf/config.json`)
+- **`heywtf/cli.py`** — entry points and interactive config wizard
+- **`heywtf/prompts.py`** — system prompts for ask vs. wtf modes
+- **`heywtf/display.py`** — Rich terminal UI
+- **`heywtf/shell/buddy.zsh`** — zsh hooks for error capture
 
-See [config.example.json](config.example.json) for a full template with all options.
-
-**Priority:** config file > defaults
-
-## Code Architecture
-
-heywtf uses a **provider abstraction** for extensibility:
-
-- **`providers.py`** — Abstract base `Provider` class
-- **`ollama_client.py`** — `OllamaProvider` (local inference)
-- **`chatgpt_client.py`** — `ChatGPTProvider` (browser automation)
-- **`openai_provider.py`** — `OpenAIProvider` (API-based)
-- **`gemini_provider.py`** — `GeminiProvider` (API-based)
-- **`provider_factory.py`** — Factory to instantiate providers by name
-
-Adding new providers is straightforward: inherit from `Provider` and implement `chat_stream()`.
+Adding a backend: inherit from `Provider`, implement `chat_stream()`, register in `provider_factory.py` and `config.py`.
 
 ## Development
 
@@ -223,31 +139,20 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-The `-e` (editable) install means changes to the source code take effect immediately — no reinstall needed:
+Test changes immediately:
 
 ```bash
-hey how to list files          # test your changes instantly
-hey o explain recursion        # test with OpenAI (if API key set)
-hey wtf                        # test wtf command
+hey how to list files
+hey wtf
+hey config
 ```
 
-To test the shell hooks in your current session:
+To test shell hooks in your current session:
 
 ```bash
-source shell/buddy.zsh
+source heywtf/shell/buddy.zsh
 ```
-
-## Contributing
-
-Contributions are welcome! To add a new provider:
-
-1. Create `<provider>_provider.py` inheriting from `Provider`
-2. Implement `chat_stream(messages: list[dict])`
-3. Update `provider_factory.py` to register it
-4. Add config support in `config.py`
-5. Update README with usage examples
 
 ## License
 
 MIT
-

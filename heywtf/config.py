@@ -1,34 +1,51 @@
-"""Configuration management for heywtf.
-
-Priority: config file > defaults.
-"""
+"""Configuration management for heywtf."""
 
 import json
 from pathlib import Path
 
-from source.providers import Backend
+from heywtf.providers import Backend
 
-DEFAULT_BACKEND = Backend.OLLAMA
 DEFAULT_OLLAMA_URL = "http://localhost:11434"
 DEFAULT_MODELS = {
     Backend.OLLAMA: "qwen2.5-coder:0.5b",
     Backend.OPENAI: "gpt-4o-mini",
     Backend.GEMINI: "gemini-2.0-flash",
-    Backend.CHATGPT_WEB: "gpt-4o-mini",
 }
 CONFIG_DIR = Path.home() / ".config" / "heywtf"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 STATE_FILE = CONFIG_DIR / "state.json"
 
+VALID_CONFIG_KEYS = [
+    "backend",
+    "ollama_model",
+    "ollama_url",
+    "openai_model",
+    "openai_api_key",
+    "gemini_model",
+    "gemini_api_key",
+]
+
+SENSITIVE_KEYS = {"openai_api_key", "gemini_api_key"}
+
 
 def _load_config_file() -> dict:
     if CONFIG_FILE.exists():
         try:
-            with open(CONFIG_FILE, "r") as f:
+            with open(CONFIG_FILE) as f:
                 return json.load(f)
         except (json.JSONDecodeError, OSError):
             return {}
     return {}
+
+
+def get_default_backend() -> Backend:
+    """Return the configured default backend, falling back to OLLAMA."""
+    cfg = _load_config_file()
+    val = cfg.get("backend", "ollama")
+    try:
+        return Backend(val)
+    except ValueError:
+        return Backend.OLLAMA
 
 
 def get_config(backend: Backend) -> dict:
@@ -43,15 +60,22 @@ def get_config(backend: Backend) -> dict:
     }
 
 
-def load_state() -> dict:
-    """Load the last failed command and error.
+def write_config(key: str, value: str) -> None:
+    """Write a single key-value pair to the config file."""
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    existing = _load_config_file()
+    existing[key] = value
+    try:
+        with open(CONFIG_FILE, "w") as f:
+            json.dump(existing, f, indent=2)
+    except OSError as e:
+        raise OSError(f"Could not write config: {e}")
 
-    Returns:
-        Dict with 'last_command' and 'last_error' keys, or empty dict if not found.
-    """
+
+def load_state() -> dict:
     if STATE_FILE.exists():
         try:
-            with open(STATE_FILE, "r") as f:
+            with open(STATE_FILE) as f:
                 return json.load(f)
         except (json.JSONDecodeError, OSError):
             pass
@@ -59,7 +83,6 @@ def load_state() -> dict:
 
 
 def save_state(command: str, error: str) -> None:
-    """Persist the most recent failed command and its error output."""
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     try:
         with open(STATE_FILE, "w") as f:
