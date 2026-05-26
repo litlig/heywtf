@@ -21,9 +21,17 @@ class OllamaProvider(Provider):
             response = requests.post(url, json=payload, stream=True, timeout=30)
             response.raise_for_status()
         except requests.ConnectionError:
+            import shutil
+            if shutil.which("ollama") is None:
+                raise ProviderError(
+                    "Ollama is not installed.\n"
+                    "  Install: https://ollama.com  or  brew install ollama\n"
+                    "  Or switch backends: hey config"
+                )
             raise ProviderError(
-                f"Cannot connect to Ollama at {self.ollama_url}.\n"
-                "Make sure Ollama is running: ollama serve"
+                f"Ollama is not running.\n"
+                "  Start it: ollama serve\n"
+                "  Or switch backends: hey config"
             )
         except requests.Timeout:
             raise ProviderError("Ollama request timed out after 30s.")

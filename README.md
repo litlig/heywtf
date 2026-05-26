@@ -69,7 +69,12 @@ $ hey wtf
   sudo chmod 777 /etc/hosts
 ```
 
-Requires shell integration (set up via `hey config`).
+Requires shell integration (set up via `hey config`). To temporarily pause capture:
+
+```bash
+buddy-off   # pause (e.g. before an interactive session)
+buddy-on    # resume
+```
 
 ### One-off backend override
 
@@ -89,13 +94,6 @@ hey config set ollama_model qwen3-coder:3b
 ```
 
 API keys can also be set via environment variables: `OPENAI_API_KEY`, `GOOGLE_API_KEY`.
-
-### Toggle error capture
-
-```bash
-buddy-off   # pause capture (e.g. before an interactive session)
-buddy-on    # resume
-```
 
 ## Ollama setup
 
