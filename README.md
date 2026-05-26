@@ -11,13 +11,13 @@ AI-powered terminal assistant for macOS. Ask how to do things in the terminal, o
 
 ## Install
 
-### macOS
-
 ```bash
-brew install litlig/tap/heywtf
+uv tool install heywtf
 ```
 
-### Linux / manual
+[Install uv](https://docs.astral.sh/uv/getting-started/installation/) if you don't have it (`brew install uv` on macOS).
+
+### Manual
 
 ```bash
 git clone https://github.com/litlig/heywtf.git
