@@ -115,20 +115,6 @@ ollama pull qwen2.5-coder:0.5b
 3. `hey wtf` reads that saved context and asks the AI to diagnose it
 4. Interactive commands (vim, ssh, top, etc.) are skipped to avoid breaking them
 
-## Architecture
-
-- **`heywtf/providers.py`** — abstract `Provider` base class + `Backend` enum
-- **`heywtf/provider_factory.py`** — instantiates providers by backend
-- **`heywtf/ollama_client.py`** — Ollama (local inference)
-- **`heywtf/openai_provider.py`** — OpenAI API
-- **`heywtf/gemini_provider.py`** — Google Gemini API
-- **`heywtf/config.py`** — config read/write (`~/.config/heywtf/config.json`)
-- **`heywtf/cli.py`** — entry points and interactive config wizard
-- **`heywtf/prompts.py`** — system prompts for ask vs. wtf modes
-- **`heywtf/display.py`** — Rich terminal UI
-- **`heywtf/shell/buddy.zsh`** — zsh hooks for error capture
-
-Adding a backend: inherit from `Provider`, implement `chat_stream()`, register in `provider_factory.py` and `config.py`.
 
 ## Development
 
