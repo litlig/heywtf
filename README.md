@@ -2,6 +2,9 @@
 
 AI-powered terminal assistant for macOS. Ask how to do things in the terminal, or diagnose the last failed command.
 
+<img width="1352" height="686" alt="heywtf" src="https://github.com/user-attachments/assets/48b3cded-faf4-44cd-885d-580a31cbf8e6" />
+
+
 > **Platform:** macOS with zsh. Linux works for `hey` queries but `hey wtf` shell integration is zsh-only.
 
 **Backends:**
