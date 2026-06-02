@@ -20,18 +20,19 @@ class GeminiProvider(Provider):
             )
 
         try:
-            import google.generativeai as genai
+            from google import genai
         except ImportError:
             raise ProviderError(
-                "google-generativeai library not installed. Try: pip install --upgrade heywtf"
+                "google-genai library not installed. Try: pip install --upgrade heywtf"
             )
 
-        genai.configure(api_key=self.api_key)
-        self._model = genai.GenerativeModel(self.model)
+        self._client = genai.Client(api_key=self.api_key)
 
     def chat_stream(self, messages: list[dict]) -> Generator[str, None, None]:
+        from google.genai import types
+
         system_parts = []
-        gemini_history = []
+        contents = []
 
         for msg in messages:
             role = msg.get("role", "user")
@@ -40,21 +41,22 @@ class GeminiProvider(Provider):
             if role == "system":
                 system_parts.append(content)
             elif role == "assistant":
-                gemini_history.append({"role": "model", "parts": [content]})
+                contents.append({"role": "model", "parts": [{"text": content}]})
             else:
-                gemini_history.append({"role": "user", "parts": [content]})
+                contents.append({"role": "user", "parts": [{"text": content}]})
+
+        config = None
+        if system_parts:
+            config = types.GenerateContentConfig(
+                system_instruction="\n".join(system_parts)
+            )
 
         try:
-            if system_parts:
-                import google.generativeai as genai
-                model = genai.GenerativeModel(
-                    self.model,
-                    system_instruction="\n".join(system_parts),
-                )
-            else:
-                model = self._model
-
-            response = model.generate_content(gemini_history, stream=True)
+            response = self._client.models.generate_content_stream(
+                model=self.model,
+                contents=contents,
+                config=config,
+            )
             for chunk in response:
                 if chunk.text:
                     yield chunk.text
