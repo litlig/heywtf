@@ -49,7 +49,7 @@ def print_clipboard_note(command: str):
 
 def print_command_header(command: str, failed: bool = False):
     if failed:
-        console.print(f"  [bold {ERROR_COLOR}]❌ Command failed:[/] [bold]{escape(command)}[/]")
+        console.print(f"  [bold {ERROR_COLOR}]💥 Command failed:[/] [bold]{escape(command)}[/]")
     else:
         console.print(f"  [bold {ACCENT}]⚡ Question:[/] [bold]{escape(command)}[/]")
 

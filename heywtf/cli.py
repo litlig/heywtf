@@ -33,6 +33,19 @@ from heywtf.clipboard import copy_to_clipboard, extract_command
 _INIT_LINE = 'eval "$(heywtf --init-shell)"'
 
 
+def _get_version() -> str:
+    from importlib.metadata import version, PackageNotFoundError
+
+    try:
+        return version("heywtf")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+def _show_version():
+    console.print(f"  [bold bright_cyan]heywtf[/] [dim]v{_get_version()}[/]")
+
+
 def _show_hey_help():
     console.print()
     console.print("  [bold bright_cyan]hey[/] — ask your terminal buddy a question")
@@ -45,6 +58,7 @@ def _show_hey_help():
     console.print("    [green]hey wtf[/]               Diagnose last failed command")
     console.print("    [green]hey config[/]            Interactive setup")
     console.print("    [green]hey config show[/]       Show current config")
+    console.print("    [green]hey version[/]           Show the installed version")
     console.print()
     console.print("  [dim]Examples:[/]")
     console.print("    hey how to count words in a file")
@@ -328,6 +342,12 @@ def hey_main():
         _show_hey_help()
         sys.exit(1)
 
+    if sys.argv[1] in ("version", "--version", "-v"):
+        console.print()
+        _show_version()
+        console.print()
+        return
+
     if sys.argv[1] == "config":
         console.print()
         _handle_config(sys.argv[2:])
@@ -410,6 +430,10 @@ def main():
         except Exception as e:
             print(f"# Error: Could not load shell integration: {e}", file=sys.stderr)
             sys.exit(1)
+    elif any(a in ("version", "--version", "-v") for a in sys.argv[1:]):
+        console.print()
+        _show_version()
+        console.print()
     else:
         console.print()
         console.print("  [bold bright_cyan]heywtf[/] — AI-powered terminal assistant")

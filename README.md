@@ -6,32 +6,26 @@ AI-powered terminal assistant for macOS. Ask how to do things in the terminal, o
 
 > **Platform:** macOS with zsh. Linux works for `hey` queries, but `hey wtf` shell integration is zsh-only.
 
-**Backends:** Ollama (local, no API key, default) · OpenAI · Gemini (both need an API key).
-
-## Install
+## Quick start
 
 ```bash
-uv tool install heywtf
+uv tool install heywtf   # don't have uv? brew install uv
+hey config               # pick a backend, set an API key, enable shell integration
+hey how to check my ip   # ask away
 ```
 
-[Install uv](https://docs.astral.sh/uv/getting-started/installation/) first if needed (`brew install uv`). Then run the setup wizard:
+`hey config` is a guided wizard — the only setup you need. Default backend is **Ollama** (local, private, no API key); **OpenAI** and **Gemini** are also supported.
 
-```bash
-hey config
-```
+## What you can do
 
-It walks you through picking a backend, setting an API key, and adding shell integration to `~/.zshrc` so `hey wtf` works.
-
-## Usage
-
-**Ask a question:**
+**Ask a question** — get the command, instantly:
 
 ```bash
 hey how to count words in a file
 hey find all python files modified in the last 24 hours
 ```
 
-**Diagnose a failed command** — just run `hey wtf` after it fails:
+**Diagnose a failure** — run `hey wtf` right after any command fails:
 
 ```
 $ chmod 777 /etc/hosts
@@ -40,35 +34,39 @@ chmod: changing permissions of '/etc/hosts': Operation not permitted
 $ hey wtf
 
   heywtf • powered by ollama (qwen2.5-coder:0.5b)
-  ❌ Command failed: chmod 777 /etc/hosts
+  💥 Command failed: chmod 777 /etc/hosts
   ──────────────────────────────────────────────────
 
-  Permission denied — use sudo for system files:
+  💡 Buddy: Permission denied — use sudo for system files:
   sudo chmod 777 /etc/hosts
 ```
 
-This needs shell integration (set up via `hey config`). Pause/resume capture with `buddy-off` / `buddy-on` — e.g. before an interactive session.
+The suggested command is **auto-copied to your clipboard** — just paste and run.
 
-The suggested command is auto-copied to your clipboard, so you can paste and run it straight away. Disable with `hey config set copy_to_clipboard false`.
+> `hey wtf` needs shell integration (enabled by `hey config`). Pause/resume capture with `buddy-off` / `buddy-on` before an interactive session.
 
-**Override the backend for one query:**
+**Switch backend for one query:**
 
 ```bash
-hey o explain async/await in Python                  # OpenAI
-hey g difference between TCP and UDP                  # Gemini
-hey l how to tail a log file                          # Ollama (local)
+hey o explain async/await in Python    # OpenAI
+hey g difference between TCP and UDP    # Gemini
+hey l how to tail a log file            # Ollama (local)
 ```
 
-## Configure
+## Configuration
 
 ```bash
+hey config                               # re-run the setup wizard
 hey config show                          # view current config
-hey config set backend openai            # default backend
-hey config set openai_api_key sk-...     # API key
+hey config set backend openai            # change default backend
+hey config set openai_api_key sk-...     # set an API key
 hey config set ollama_model qwen3-coder:3b
+hey config set copy_to_clipboard false   # disable clipboard auto-copy
 ```
 
-API keys can also come from `OPENAI_API_KEY` / `GOOGLE_API_KEY`. For the default Ollama backend:
+API keys can also come from the `OPENAI_API_KEY` / `GOOGLE_API_KEY` environment variables.
+
+**Using Ollama (the default):** install and pull a model first —
 
 ```bash
 brew install ollama && ollama serve
@@ -77,7 +75,7 @@ ollama pull qwen2.5-coder:0.5b
 
 ## How `hey wtf` works
 
-A zsh `preexec` hook captures each command and its stderr; a `precmd` hook saves the command and error if the exit code is non-zero. `hey wtf` then reads that context and asks the AI to diagnose it. Interactive commands (vim, ssh, top, etc.) are skipped.
+A zsh `preexec` hook captures each command and its stderr; a `precmd` hook saves the command and error when the exit code is non-zero. `hey wtf` reads that context and asks the AI to diagnose it. Interactive commands (vim, ssh, top, etc.) are skipped.
 
 ## Development
 
