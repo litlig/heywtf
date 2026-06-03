@@ -49,11 +49,14 @@ $ hey wtf
 
 This needs shell integration (set up via `hey config`). Pause/resume capture with `buddy-off` / `buddy-on` — e.g. before an interactive session.
 
+The suggested command is auto-copied to your clipboard, so you can paste and run it straight away. Disable with `hey config set copy_to_clipboard false`.
+
 **Override the backend for one query:**
 
 ```bash
 hey o explain async/await in Python                  # OpenAI
 hey g difference between TCP and UDP                  # Gemini
+hey l how to tail a log file                          # Ollama (local)
 ```
 
 ## Configure

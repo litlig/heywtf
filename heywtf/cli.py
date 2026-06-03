@@ -26,7 +26,9 @@ from heywtf.display import (
     print_command_header,
     print_separator,
     print_banner,
+    print_clipboard_note,
 )
+from heywtf.clipboard import copy_to_clipboard, extract_command
 
 _INIT_LINE = 'eval "$(heywtf --init-shell)"'
 
@@ -39,6 +41,7 @@ def _show_hey_help():
     console.print("    [green]hey[/] <question>       Ask using the configured backend")
     console.print("    [green]hey o[/] <question>     Ask using OpenAI (one-off override)")
     console.print("    [green]hey g[/] <question>     Ask using Gemini (one-off override)")
+    console.print("    [green]hey l[/] <question>     Ask using Ollama (one-off override)")
     console.print("    [green]hey wtf[/]               Diagnose last failed command")
     console.print("    [green]hey config[/]            Interactive setup")
     console.print("    [green]hey config show[/]       Show current config")
@@ -67,6 +70,9 @@ def _parse_hey_arguments() -> tuple[Backend, bool, str]:
         args = args[1:]
     elif args[0] in ("g", "gemini"):
         backend = Backend.GEMINI
+        args = args[1:]
+    elif args[0] in ("l", "ollama"):
+        backend = Backend.OLLAMA
         args = args[1:]
 
     if not args:
@@ -266,7 +272,7 @@ def _show_config():
     console.print(f"  [dim]{'backend':<20}[/] {backend_val}")
     console.print()
 
-    for key in ["ollama_model", "ollama_url", "openai_model", "openai_api_key", "gemini_model", "gemini_api_key"]:
+    for key in ["ollama_model", "ollama_url", "openai_model", "openai_api_key", "gemini_model", "gemini_api_key", "copy_to_clipboard"]:
         val = file_config.get(key)
         if val is None:
             display = "[dim](not set)[/]"
@@ -373,7 +379,12 @@ def hey_main():
             yield first_chunk
             yield from chunks
 
-        stream_response(_rejoin())
+        full_response = stream_response(_rejoin())
+
+        if config.get("copy_to_clipboard"):
+            command = extract_command(full_response, is_fix=is_wtf)
+            if command and copy_to_clipboard(command):
+                print_clipboard_note(command)
 
     except ProviderError as e:
         console.print()

@@ -23,6 +23,7 @@ VALID_CONFIG_KEYS = [
     "openai_api_key",
     "gemini_model",
     "gemini_api_key",
+    "copy_to_clipboard",
 ]
 
 SENSITIVE_KEYS = {"openai_api_key", "gemini_api_key"}
@@ -57,7 +58,15 @@ def get_config(backend: Backend) -> dict:
         "model": file_config.get(model_key) or DEFAULT_MODELS.get(backend),
         "openai_api_key": file_config.get("openai_api_key"),
         "gemini_api_key": file_config.get("gemini_api_key"),
+        "copy_to_clipboard": _as_bool(file_config.get("copy_to_clipboard", True)),
     }
+
+
+def _as_bool(value) -> bool:
+    """Coerce a config value (bool or string) to a boolean. Defaults to True."""
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() not in ("false", "0", "no", "off")
 
 
 def write_config(key: str, value: str) -> None:

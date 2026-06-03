@@ -42,6 +42,11 @@ def stream_response(chunks: Generator[str, None, None]):
     return "".join(full_response)
 
 
+def print_clipboard_note(command: str):
+    console.print(f"  [{DIM}]📋 copied to clipboard:[/] [{ACCENT}]{escape(command)}[/]")
+    console.print()
+
+
 def print_command_header(command: str, failed: bool = False):
     if failed:
         console.print(f"  [bold {ERROR_COLOR}]❌ Command failed:[/] [bold]{escape(command)}[/]")

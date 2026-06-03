@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heywtf"
-version = "0.1.1"
+version = "0.2.0"
 description = "AI-powered terminal assistant — ask anything or diagnose failures with 'hey wtf'"
 readme = "README.md"
 license = "MIT"
