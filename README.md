@@ -1,6 +1,8 @@
 # heywtf
 
-AI-powered terminal assistant for macOS. Ask how to do things in the terminal, or diagnose the last failed command.
+Ask your terminal anything in plain English, or run `hey wtf` to explain and fix the last failed command — AI-powered, right where you already work.
+
+No context-switching to a browser, no rule files to maintain, no new terminal app to migrate into.
 
 <img width="1352" height="686" alt="heywtf" src="https://github.com/user-attachments/assets/48b3cded-faf4-44cd-885d-580a31cbf8e6" />
 
@@ -15,6 +17,18 @@ hey how to check my ip   # ask away
 ```
 
 `hey config` is a guided wizard — the only setup you need. Default backend is **Ollama** (local, private, no API key); **OpenAI** and **Gemini** are also supported.
+
+## How it compares
+
+|                                   | **heywtf** | [TheFuck](https://github.com/nvbn/thefuck) | ChatGPT in a browser | AI terminal apps |
+| --------------------------------- | :--------: | :----------------------------------------: | :------------------: | :--------------: |
+| Fixes a failed command            |   ✅ AI    |              ⚠️ fixed rules                |     ⚠️ copy-paste    |        ✅        |
+| Handles errors nobody wrote a rule for |   ✅    |                     ❌                     |          ✅          |        ✅        |
+| Answers free-form "how do I…"     |     ✅     |                     ❌                     |    ✅ but you leave  |        ✅        |
+| Stays in your existing terminal   |     ✅     |                     ✅                     |          ❌          | ❌ new app/workflow |
+| Runs fully local & private        | ✅ Ollama  |                     ✅                     |          ❌          |      varies      |
+
+The short version: **TheFuck matches errors against hardcoded rules; heywtf reasons about them with an LLM** — so it handles errors no rule covers and explains *why*. And unlike pasting into a browser or moving your whole workflow into an AI terminal, heywtf is a lightweight CLI that drops into the shell you already use.
 
 ## What you can do
 
@@ -62,6 +76,7 @@ hey config set backend openai            # change default backend
 hey config set openai_api_key sk-...     # set an API key
 hey config set ollama_model qwen3-coder:3b
 hey config set copy_to_clipboard false   # disable clipboard auto-copy
+hey version                              # show the installed version
 ```
 
 API keys can also come from the `OPENAI_API_KEY` / `GOOGLE_API_KEY` environment variables.
